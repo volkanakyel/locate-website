@@ -138,7 +138,7 @@ const handleSearch = async (domain: string) => {
   const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/.*$/, '').toLowerCase()
 
   // Get mock data or default to Google
-  const serverData = mockServerData[cleanDomain] || mockServerData['google.com']
+  const serverData = mockServerData[cleanDomain] ?? mockServerData['google.com']!
 
   // Update globe with location
   targetLocation.value = {
