@@ -20,12 +20,12 @@ export default {
       },
       borderRadius: {
         '4xl': '2rem',
-      },
+        },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out forwards',
         'slide-up': 'slideUp 0.5s ease-out forwards',
         'pulse-slow': 'pulse 3s ease-in-out infinite',
-      },
+        },
       keyframes: {
         fadeIn: {
           from: { opacity: '0' },
