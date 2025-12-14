@@ -12,6 +12,16 @@
     scroll-behavior: smooth;
   }
 
+  /* Custom cursor: hide native cursor on non-touch devices */
+  html.custom-cursor-enabled {
+    cursor: none;
+  }
+
+  html.custom-cursor-enabled body,
+  html.custom-cursor-enabled * {
+    cursor: none !important;
+  }
+
   body {
     @apply bg-zinc-950 text-zinc-100 antialiased;
     font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
