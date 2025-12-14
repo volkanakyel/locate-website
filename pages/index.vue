@@ -25,6 +25,8 @@
             @search="handleSearch"
             :loading="loading"
             :has-result="hasSearched"
+            :server-result="serverResult"
+            :error="error"
           />
         </div>
 
@@ -32,124 +34,74 @@
       </div>
     </div>
 
-    <div class="fixed bottom-0 inset-x-0 z-20 pointer-events-none">
-      <div class="flex justify-center pb-4 lg:pb-6">
-        <div class="flex items-center gap-2 text-zinc-600 text-xs">
-          <span class="hidden sm:inline">Drag to rotate</span>
-          <span class="hidden sm:inline">•</span>
-          <span>Click marker for details</span>
-        </div>
-      </div>
-    </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 
-interface ServerLocation {
-  country: string
-  city: string
+interface ServerLocationResult {
+  success: boolean
+  domain: string
   ip: string
-  coordinates: { lat: number; lon: number }
-  provider: string
+  country: string
   countryCode: string
-}
-
-// Mock data for server locations
-const mockServerData: Record<string, ServerLocation> = {
-  'google.com': {
-    country: 'United States',
-    city: 'Mountain View, CA',
-    ip: '142.250.185.46',
-    coordinates: { lat: 37.4056, lon: -122.0775 },
-    provider: 'Google LLC',
-    countryCode: 'US'
-  },
-  'github.com': {
-    country: 'United States',
-    city: 'San Francisco, CA',
-    ip: '140.82.121.4',
-    coordinates: { lat: 37.7749, lon: -122.4194 },
-    provider: 'GitHub, Inc.',
-    countryCode: 'US'
-  },
-  'bbc.co.uk': {
-    country: 'United Kingdom',
-    city: 'London',
-    ip: '151.101.192.81',
-    coordinates: { lat: 51.5074, lon: -0.1278 },
-    provider: 'BBC',
-    countryCode: 'GB'
-  },
-  'alibaba.com': {
-    country: 'China',
-    city: 'Hangzhou',
-    ip: '106.11.248.146',
-    coordinates: { lat: 30.2741, lon: 120.1551 },
-    provider: 'Alibaba Group',
-    countryCode: 'CN'
-  },
-  'amazon.com': {
-    country: 'United States',
-    city: 'Seattle, WA',
-    ip: '205.251.242.103',
-    coordinates: { lat: 47.6062, lon: -122.3321 },
-    provider: 'Amazon.com, Inc.',
-    countryCode: 'US'
-  },
-  'spotify.com': {
-    country: 'Sweden',
-    city: 'Stockholm',
-    ip: '35.186.224.25',
-    coordinates: { lat: 59.3293, lon: 18.0686 },
-    provider: 'Spotify AB',
-    countryCode: 'SE'
-  },
-  'toyota.com': {
-    country: 'Japan',
-    city: 'Tokyo',
-    ip: '23.55.161.147',
-    coordinates: { lat: 35.6762, lon: 139.6503 },
-    provider: 'Toyota Motor Corp',
-    countryCode: 'JP'
-  },
-  'samsung.com': {
-    country: 'South Korea',
-    city: 'Seoul',
-    ip: '52.85.132.99',
-    coordinates: { lat: 37.5665, lon: 126.9780 },
-    provider: 'Samsung Electronics',
-    countryCode: 'KR'
+  city: string
+  region: string
+  coordinates: {
+    lat: number
+    lon: number
   }
+  provider: string
+  organization: string
+  timezone: string
+  error?: string
 }
 
 const loading = ref(false)
 const hasSearched = ref(false)
+const error = ref<string | null>(null)
+const serverResult = ref<ServerLocationResult | null>(null)
 const targetLocation = ref<{ lat: number; lon: number; country: string; city: string } | null>(null)
 
 const handleSearch = async (domain: string) => {
   loading.value = true
+  error.value = null
+  serverResult.value = null
 
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1200))
+  try {
+    const response = await fetch(`/api/server-location?domain=${encodeURIComponent(domain)}`)
 
-  // Clean domain input
-  const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/.*$/, '').toLowerCase()
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`)
+    }
 
-  // Get mock data or default to Google
-  const serverData = mockServerData[cleanDomain] ?? mockServerData['google.com']!
+    const data: ServerLocationResult = await response.json()
 
-  // Update globe with location
-  targetLocation.value = {
-    lat: serverData.coordinates.lat,
-    lon: serverData.coordinates.lon,
-    country: serverData.country,
-    city: serverData.city
+    if (!data.success) {
+      error.value = data.error || 'Failed to locate server'
+      loading.value = false
+      hasSearched.value = true
+      return
+    }
+
+    serverResult.value = data
+
+    targetLocation.value = {
+      lat: data.coordinates.lat,
+      lon: data.coordinates.lon,
+      country: data.country,
+      city: data.city
+    }
+
+    hasSearched.value = true
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'An unexpected error occurred'
+    hasSearched.value = true
+  } finally {
+    loading.value = false
   }
-
-  loading.value = false
-  hasSearched.value = true
 }
 </script>
 
@@ -171,7 +123,6 @@ const handleSearch = async (domain: string) => {
   transform: scale(1.02);
 }
 
-/* Safe area padding for iPhone notch */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .min-h-\[100dvh\] {
     min-height: 100dvh;
