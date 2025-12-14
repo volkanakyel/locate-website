@@ -101,9 +101,37 @@
     <!-- Results Area -->
     <div class="mt-6 sm:mt-8 min-h-[140px] sm:min-h-[160px]">
       <Transition name="result" mode="out-in">
+        <!-- Error State -->
+        <div
+          v-if="error && !loading"
+          key="error"
+          class="relative overflow-hidden"
+        >
+          <div class="relative bg-zinc-900/50 backdrop-blur-sm border border-red-900/50 rounded-2xl p-4 sm:p-5">
+            <!-- Error badge -->
+            <div class="flex items-center gap-2 mb-4">
+              <span class="relative flex h-2 w-2">
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+              </span>
+              <span class="text-xs text-red-400 font-medium tracking-wide uppercase">Error</span>
+            </div>
+
+            <!-- Error message -->
+            <div class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <p class="text-sm text-red-300 font-medium">Could not locate server</p>
+                <p class="text-xs text-zinc-500 mt-1">{{ error }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Results Display -->
         <div
-          v-if="showResult && hasResult"
+          v-else-if="showResult && result"
           key="results"
           class="relative overflow-hidden"
         >
@@ -167,7 +195,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
+
+interface ServerResult {
+  success: boolean
+  domain: string
+  ip: string
+  country: string
+  countryCode: string
+  city: string
+  region: string
+  coordinates: {
+    lat: number
+    lon: number
+  }
+  provider: string
+  organization: string
+  timezone: string
+  error?: string
+}
 
 const emit = defineEmits<{
   search: [domain: string]
@@ -176,16 +222,25 @@ const emit = defineEmits<{
 const props = defineProps<{
   loading: boolean
   hasResult?: boolean
+  serverResult?: ServerResult | null
+  error?: string | null
 }>()
 
 const domain = ref('')
 const showResult = ref(false)
-const result = ref({
-  country: 'United States',
-  city: 'Mountain View, CA',
-  ip: '142.250.185.46',
-  provider: 'Google LLC',
-  countryCode: 'US'
+
+// Compute result from props for display
+const result = computed(() => {
+  if (props.serverResult) {
+    return {
+      country: props.serverResult.country,
+      city: props.serverResult.city,
+      ip: props.serverResult.ip,
+      provider: props.serverResult.provider,
+      countryCode: props.serverResult.countryCode
+    }
+  }
+  return null
 })
 
 const examples = ['google.com', 'github.com', 'spotify.com', 'amazon.com']
@@ -198,30 +253,27 @@ const handleSubmit = () => {
   if (domain.value.trim()) {
     showResult.value = false
     emit('search', domain.value)
-
-    // Show result after animation
-    setTimeout(() => {
-      const cleanDomain = domain.value.replace(/^https?:\/\//, '').replace(/\/.*$/, '').toLowerCase()
-      const mockData: Record<string, any> = {
-        'google.com': { country: 'United States', city: 'Mountain View, CA', ip: '142.250.185.46', provider: 'Google LLC', countryCode: 'US' },
-        'github.com': { country: 'United States', city: 'San Francisco, CA', ip: '140.82.121.4', provider: 'GitHub, Inc.', countryCode: 'US' },
-        'bbc.co.uk': { country: 'United Kingdom', city: 'London', ip: '151.101.192.81', provider: 'BBC', countryCode: 'GB' },
-        'alibaba.com': { country: 'China', city: 'Hangzhou', ip: '106.11.248.146', provider: 'Alibaba Group', countryCode: 'CN' },
-        'amazon.com': { country: 'United States', city: 'Seattle, WA', ip: '205.251.242.103', provider: 'Amazon.com, Inc.', countryCode: 'US' },
-        'spotify.com': { country: 'Sweden', city: 'Stockholm', ip: '35.186.224.25', provider: 'Spotify AB', countryCode: 'SE' },
-        'toyota.com': { country: 'Japan', city: 'Tokyo', ip: '23.55.161.147', provider: 'Toyota Motor Corp', countryCode: 'JP' },
-        'samsung.com': { country: 'South Korea', city: 'Seoul', ip: '52.85.132.99', provider: 'Samsung Electronics', countryCode: 'KR' }
-      }
-      result.value = mockData[cleanDomain] || mockData['google.com']
-      showResult.value = true
-    }, 1400)
   }
 }
 
-// Watch for hasResult prop to control visibility
-watch(() => props.hasResult, (val) => {
-  if (val) {
+// Watch for serverResult prop to control visibility
+watch(() => props.serverResult, (val) => {
+  if (val && val.success) {
     showResult.value = true
+  }
+})
+
+// Reset showResult when loading starts
+watch(() => props.loading, (val) => {
+  if (val) {
+    showResult.value = false
+  }
+})
+
+// Also watch for error to potentially show error state
+watch(() => props.error, (val) => {
+  if (val) {
+    showResult.value = false
   }
 })
 </script>
