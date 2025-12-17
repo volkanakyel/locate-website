@@ -9,10 +9,9 @@
     <div class="relative z-10 min-h-[100dvh] flex flex-col lg:flex-row">
       <div
         class="relative w-full lg:w-1/2 h-[45vh] sm:h-[50vh] lg:h-screen order-1 lg:order-2 flex items-center justify-center"
-        :class="{ 'globe-active': hasSearched }"
       >
         <div class="relative w-full h-full flex items-center justify-center p-4 sm:p-8 lg:p-12">
-          <div class="relative w-full h-full max-w-[400px] lg:max-w-[500px] aspect-square flex items-center justify-center globe-wrapper">
+          <div class="relative w-full h-full max-w-[400px] lg:max-w-[500px] aspect-square flex items-center justify-center">
             <InteractiveGlobe :target-location="targetLocation" />
           </div>
         </div>
@@ -111,22 +110,5 @@ const handleSearch = async (domain: string) => {
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
-}
-
-@keyframes bounce-subtle {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(4px); }
-}
-
-.animate-bounce-subtle {
-  animation: bounce-subtle 2s ease-in-out infinite;
-}
-
-.globe-wrapper {
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.globe-active .globe-wrapper {
-  transform: scale(1.02);
 }
 </style>

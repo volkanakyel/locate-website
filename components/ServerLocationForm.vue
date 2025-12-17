@@ -4,13 +4,13 @@
     <div class="mb-8 sm:mb-10 overflow-hidden">
       <p
         class="text-orange-500/80 text-xs sm:text-sm font-medium tracking-[0.2em] uppercase mb-3 sm:mb-4 animate-slide-up"
-        style="animation-delay: 0.1s"
+        style="animation-delay: 0.2s"
       >
         Server Discovery
       </p>
       <h1
         class="text-3xl sm:text-4xl lg:text-5xl font-light text-white leading-[1.1] tracking-tight animate-slide-up"
-        style="animation-delay: 0.2s"
+        style="animation-delay: 0.35s"
       >
         Find where any<br />
         <span class="text-zinc-400">website lives</span>
@@ -21,7 +21,7 @@
     <form
       @submit.prevent="handleSubmit"
       class="space-y-3 sm:space-y-4 mb-6 sm:mb-8 animate-slide-up"
-      style="animation-delay: 0.3s"
+      style="animation-delay: 0.5s"
     >
       <div class="relative group">
         <!-- Input glow effect -->
@@ -54,27 +54,26 @@
       <button
         type="submit"
         :disabled="loading || !domain.trim()"
-        class="relative w-full py-3.5 sm:py-4 bg-white text-zinc-900 text-sm sm:text-base font-medium rounded-xl overflow-hidden transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-zinc-100 active:scale-[0.98] group"
+        class="relative w-full h-[52px] sm:h-[56px] bg-white text-zinc-900 text-sm sm:text-base font-medium rounded-xl overflow-hidden disabled:opacity-30 disabled:cursor-not-allowed hover:bg-zinc-100 active:scale-[0.98] group btn-submit"
       >
+        <!-- Default state -->
         <span
-          class="relative z-10 flex items-center justify-center gap-2 transition-transform duration-300"
-          :class="{ '-translate-y-10 opacity-0': loading }"
+          class="btn-state absolute inset-0 flex items-center justify-center gap-2"
+          :class="loading ? 'btn-state-out' : 'btn-state-in'"
         >
           Locate Server
-          <svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
         </span>
 
         <!-- Loading state -->
         <span
-          class="absolute inset-0 flex items-center justify-center transition-transform duration-300"
-          :class="loading ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'"
+          class="btn-state absolute inset-0 flex items-center justify-center gap-2"
+          :class="loading ? 'btn-state-in' : 'btn-state-out'"
         >
-          <span class="flex items-center gap-2">
-            <span class="loader"></span>
-            <span class="text-zinc-600">Searching...</span>
-          </span>
+          <span class="loader"></span>
+          <span class="text-zinc-600">Searching...</span>
         </span>
       </button>
     </form>
@@ -82,7 +81,7 @@
     <!-- Quick Examples -->
     <div
       class="animate-slide-up"
-      style="animation-delay: 0.4s"
+      style="animation-delay: 0.65s"
     >
       <p class="text-zinc-600 text-xs uppercase tracking-wider mb-3 text-center sm:text-left">Try these</p>
       <div class="flex flex-wrap justify-center sm:justify-start gap-2">
@@ -90,8 +89,8 @@
           v-for="(example, index) in examples"
           :key="example"
           @click="selectExample(example)"
-          class="px-3 sm:px-4 py-2 text-xs sm:text-sm text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-600 hover:bg-zinc-800/50 rounded-full transition-all duration-300 active:scale-95"
-          :style="{ animationDelay: `${0.45 + index * 0.05}s` }"
+          class="example-btn px-3 sm:px-4 py-2 text-xs sm:text-sm text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-600 hover:bg-zinc-800/50 rounded-full transition-all duration-300 active:scale-95"
+          :style="{ animationDelay: `${0.7 + index * 0.08}s` }"
         >
           {{ example }}
         </button>
@@ -282,7 +281,7 @@ watch(() => props.error, (val) => {
 @keyframes slide-up {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -292,22 +291,46 @@ watch(() => props.error, (val) => {
 
 .animate-slide-up {
   opacity: 0;
-  animation: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.example-btn {
+  opacity: 0;
+  animation: slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Button submit smooth transitions */
+.btn-submit {
+  transition: background-color 0.3s ease, transform 0.15s ease;
+}
+
+.btn-state {
+  transition: opacity 0.35s ease-out;
+  will-change: opacity;
+}
+
+.btn-state-in {
+  opacity: 1;
+}
+
+.btn-state-out {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .result-enter-active {
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .result-leave-active {
-  transition: all 0.2s ease-out;
+  transition: all 0.3s ease-out;
 }
 .result-enter-from {
   opacity: 0;
-  transform: translateY(16px) scale(0.98);
+  transform: translateY(20px) scale(0.96);
 }
 .result-leave-to {
   opacity: 0;
-  transform: translateY(-8px) scale(0.98);
+  transform: translateY(-12px) scale(0.96);
 }
 
 .loader {

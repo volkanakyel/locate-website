@@ -1,5 +1,5 @@
 <template>
-  <div class="relative flex items-center justify-center w-full h-full">
+  <div class="relative flex items-center justify-center w-full h-full globe-container" :class="{ 'globe-loaded': isLoaded }">
     <svg
       ref="svgRef"
       :viewBox="`0 0 ${width} ${height}`"
@@ -56,6 +56,7 @@ const svgRef = ref<SVGSVGElement | null>(null)
 const showTooltip = ref(false)
 const tooltipData = ref<{ country: string; city: string } | null>(null)
 const tooltipPosition = ref({ x: 0, y: 0 })
+const isLoaded = ref(false)
 
 const width = 600
 const height = 600
@@ -478,6 +479,10 @@ onMounted(async () => {
     const world: any = await response.json()
     worldData = (feature(world, world.objects.countries) as unknown as FeatureCollection<Geometry>).features
     needsRender = true
+    // Trigger entrance animation after a small delay
+    setTimeout(() => {
+      isLoaded.value = true
+    }, 100)
   } catch {
     worldData = [{
       type: 'Feature',
@@ -488,6 +493,7 @@ onMounted(async () => {
       properties: {}
     }]
     needsRender = true
+    isLoaded.value = true
   }
 })
 
@@ -720,7 +726,18 @@ function handleReset() {
 </script>
 
 <style scoped>
-/* Animations are handled via D3 JavaScript for proper SVG support */
+/* Globe entrance animation - only runs once on load */
+.globe-container {
+  opacity: 0;
+  transform: scale(0.92);
+}
+
+.globe-container.globe-loaded {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: 0.2s;
+}
 
 /* Tooltip transition */
 .tooltip-enter-active {
