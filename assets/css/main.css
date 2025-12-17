@@ -10,6 +10,8 @@
   html {
     -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
+    background-color: #09090b;
+    min-height: 100%;
   }
 
   /* Custom cursor: hide native cursor on non-touch devices */
@@ -29,6 +31,15 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-height: 100dvh;
+    min-height: -webkit-fill-available;
+  }
+
+  #__nuxt,
+  #app-root {
+    min-height: 100dvh;
+    min-height: -webkit-fill-available;
+    background-color: #09090b;
   }
 
   /* Custom scrollbar */

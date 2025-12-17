@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-[100dvh] bg-zinc-950 relative overflow-hidden">
-    <div class="fixed inset-0 pointer-events-none overflow-hidden">
+  <div class="min-h-[100dvh] bg-zinc-950 relative overflow-hidden safe-area-container">
+    <div class="fixed inset-0 pointer-events-none overflow-hidden bg-zinc-950">
       <div class="absolute -top-[20%] left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-auto lg:right-[10%] lg:top-[5%] w-[80vw] h-[80vw] max-w-[600px] max-h-[600px] bg-orange-500/5 rounded-full blur-[100px] lg:blur-[120px]"></div>
       <div class="absolute -bottom-[10%] left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[10%] lg:bottom-[10%] w-[70vw] h-[70vw] max-w-[500px] max-h-[500px] bg-zinc-500/5 rounded-full blur-[80px] lg:blur-[100px]"></div>
       <div class="lg:hidden absolute top-[30%] left-1/2 -translate-x-1/2 w-[100vw] h-[60vh] bg-orange-500/[0.02] rounded-full blur-[80px]"></div>
@@ -106,6 +106,13 @@ const handleSearch = async (domain: string) => {
 </script>
 
 <style scoped>
+.safe-area-container {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
 @keyframes bounce-subtle {
   0%, 100% { transform: translateX(-50%) translateY(0); }
   50% { transform: translateX(-50%) translateY(4px); }
@@ -121,12 +128,5 @@ const handleSearch = async (domain: string) => {
 
 .globe-active .globe-wrapper {
   transform: scale(1.02);
-}
-
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-  .min-h-\[100dvh\] {
-    min-height: 100dvh;
-    padding-bottom: env(safe-area-inset-bottom);
-  }
 }
 </style>

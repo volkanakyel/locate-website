@@ -1,5 +1,5 @@
 <template>
-  <div id="app-root">
+  <div id="app-root" class="app-container">
     <ClientOnly>
       <CustomCursor />
     </ClientOnly>
@@ -54,5 +54,12 @@ html.custom-cursor-enabled object {
   html * {
     cursor: auto !important;
   }
+}
+
+/* Full height container with safe area background */
+.app-container {
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  background-color: #09090b;
 }
 </style>
