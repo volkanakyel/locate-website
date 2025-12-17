@@ -243,7 +243,7 @@ const result = computed(() => {
   return null
 })
 
-const examples = ['google.com', 'github.com', 'spotify.com', 'amazon.com']
+const examples = ['google.com', 'bbc.co.uk', 'abc.net.au', 'alibaba.com']
 
 const selectExample = (example: string) => {
   domain.value = example
