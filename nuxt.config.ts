@@ -36,8 +36,8 @@ export default defineNuxtConfig({
           href: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap'
         },
         // Favicon
-        { rel: 'icon', type: 'image/svg+xml', href: '/icon.svg' },
-        { rel: 'apple-touch-icon', href: '/apple-icon.png' },
+        { rel: 'icon', type: 'image/png', href: '/logo.png' },
+        { rel: 'apple-touch-icon', href: '/logo.png' },
       ],
     },
   },
